@@ -46,6 +46,7 @@
 										<v-flex xs12 sm4 md4>
 											<v-btn color="success" @click="openFileInput()">Upload File</v-btn>
 											<input type="file" id="fileInput" ref="fileInput" @change="addFile(this)">
+											{{ files.length }} Upload
 										</v-flex>
 										<v-flex xs12 sm4 md4>
 											<v-btn color="success" @click="openWatermarkInput()">Upload Watermark</v-btn>
