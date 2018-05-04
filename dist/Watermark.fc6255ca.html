@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons" rel="stylesheet">
+	<link href="https://unpkg.com/vuetify/dist/vuetify.min.css" rel="stylesheet">
+</head>
+<body>
+	<div id="app">
+		<v-app>
+			<v-content>
+				<v-container>
+					<v-flex xs12="">
+						<v-card>
+							<v-card-title>
+								<span class="headline">WaterMark Generator</span>
+							</v-card-title>
+							<v-card-text>
+								<v-container grid-list-md="">
+									<v-layout wrap="">
+										<v-flex xs12="" sm6="" md6="">
+											<v-btn color="success">Upload File</v-btn>
+										</v-flex>
+									</v-layout>
+								</v-container>
+							</v-card-text>
+							<v-card-actions>
+								<v-spacer></v-spacer>
+								<v-btn color="blue darken-1" flat="" @click.native="dialog = false">Close</v-btn>
+								<v-btn color="blue darken-1" flat="" @click.native="dialog = false">Save</v-btn>
+							</v-card-actions>
+						</v-card>
+					</v-flex>
+				</v-container>
+			</v-content>
+		</v-app>
+	</div>
+	
+	<script src="https://unpkg.com/watermarkjs@2.0.0/dist/watermark.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.js"></script>
+	<script src="https://unpkg.com/vuetify/dist/vuetify.js"></script>
+	<script>
+		$(document).ready(function(){
+			$("#file").click(function(){
+				$(this).val("");
+			});
+
+			$("#file").change(function(){
+				watermark([this.files[0], './img/logo.png'])
+				.image(watermark.image.lowerLeft(0.5))
+				.then(img => document.getElementById('container').appendChild(img));
+			});
+		});
+
+
+
+		app = new Vue({
+			el: '#app',
+			data: {
+				
+			},
+			methods: {
+				route(){
+					this.routePath = location.pathname
+					if(location.search != ""){
+						callbackParams = {}
+						location.search.substr(1).split("&").forEach(function(item) {callbackParams[item.split("=")[0]] = item.split("=")[1]})
+						this.callbackParams = callbackParams;
+					}
+					if(this.routePath == "/callback"){
+						console.log("hey")
+						this.login()
+					}
+				},
+			},
+			created: function(){
+				this.route()
+			}
+		})
+	</script>
+</body>
+</html>
