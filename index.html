@@ -3,9 +3,9 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Document</title>
-	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	<script src="js/jquery-3.3.1.min.js"></script>
 	<link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
-	<link href="https://unpkg.com/vuetify/dist/vuetify.min.css" rel="stylesheet">
+	<link href="css/vuetify.min.css" rel="stylesheet">
 	<style>
 	input[type=file] {
 		display: none;
@@ -32,51 +32,31 @@
 									<img :src="sample" class="sample mx-auto">
 								</v-container>
 								<v-container>
-									{{ watermarkOption.orientation }}
-									<v-radio-group v-model="watermarkOption.orientation" @change="updateSample()">
-										<v-radio label="lowerRight" value="lowerRight"></v-radio>
-										<v-radio label="lowerLeft" value="lowerLeft"></v-radio>
-										<v-radio label="upperRight" value="upperRight"></v-radio>
-										<v-radio label="upperLeft" value="upperLeft"></v-radio>
-										<v-radio label="center" value="center"></v-radio>
+									<v-radio-group label="Orientation" v-model="watermarkOption.orientation" @change="updateSample()" row>
+										<v-radio label="Lower Right" value="lowerRight"></v-radio>
+										<v-radio label="Lower Left" value="lowerLeft"></v-radio>
+										<v-radio label="Upper Right" value="upperRight"></v-radio>
+										<v-radio label="Upper Left" value="upperLeft"></v-radio>
+										<v-radio label="Center" value="center"></v-radio>
 									</v-radio-group>
+									<v-slider Label="Opacity" v-model="watermarkOption.opacity" thumb-label min="10" step="10" ticks @click="updateSample()"></v-slider>
 								</v-container>
-								<v-container grid-list-md>
+								<v-container justify-space-between>
 									<v-layout wrap>
-										<v-flex xs12 sm6 md6>
+										<v-flex xs12 sm4 md4>
 											<v-btn color="success" @click="openFileInput()">Upload File</v-btn>
-											<input type="file" id="fileInput" ref="fileInput" @change="addFile(this)">
+											<input type="file" id="fileInput" ref="fileInput" multiple @change="addFile(this)">
 										</v-flex>
-										<v-flex xs12 sm6 md6>
+										<v-flex xs12 sm4 md4>
 											<v-btn color="success" @click="openWatermarkInput()">Upload Watermark</v-btn>
 											<input type="file" id="watermarkInput" ref="watermarkInput" @change="addWatermark(this)">
 										</v-flex>
-									</v-layout>
-								</v-container>
-								<v-container>
-									<v-layout row wrap>
-										<v-flex xs4 v-for="file, n in files" :key="n" >
-											<v-card flat tile>
-												<v-card-media :src="file.base64" height="200px"></v-card-media>
-											</v-card>
-										</v-flex>
-									</v-layout>
-								</v-container>
-								<v-container>
-									<v-layout row wrap>
-										<v-flex xs4 v-for="file, n in watermarkedFiles" :key="n" >
-											<v-card flat tile>
-												<v-card-media :src="file" height="200px"></v-card-media>
-											</v-card>
+										<v-flex xs12 sm4 md4>
+											<v-btn color="success" @click="generateWatermark()">Generate Watermark</v-btn>
 										</v-flex>
 									</v-layout>
 								</v-container>
 							</v-card-text>
-							<v-container id="container"></v-container>
-							<v-card-actions>
-								<v-spacer></v-spacer>
-								<v-btn color="blue darken-1" flat @click="generateWatermark()">Generate Watermark</v-btn>
-							</v-card-actions>
 						</v-card>
 					</v-flex>
 				</v-container>
@@ -84,9 +64,9 @@
 		</v-app>
 	</div>
 
-	<script src="https://unpkg.com/watermarkjs@2.0.0/dist/watermark.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.js"></script>
-	<script src="https://unpkg.com/vuetify/dist/vuetify.js"></script>
+	<script type="text/javascript" src="js/watermark.min.js"></script>
+	<script type="text/javascript" src="js/vue.min.js"></script>
+	<script type="text/javascript" src="js/vuetify.min.js"></script>
 	<script>
 		app = new Vue({
 			el: '#app',
@@ -99,7 +79,16 @@
 				watermarkedFiles: [],
 				sample: null,
 				watermarkOption: {
+					watermark: null,
+					text: {
+						value: 'Sample',
+						fontFamily: 'Arial',
+						size: '25px',
+						color: '#FFFFFF',
+					},
+					opacity: 50,
 					orientation: 'lowerRight',
+					type: 'watermark',
 				},
 			},
 			methods: {
@@ -141,13 +130,24 @@
 					reader.onload = function () {
 						base64 = reader.result;
 						watermark.base64 = base64;
-						self.watermark = watermark;
+						self.watermarkOption.watermark = watermark;
 					};
 				},
 				generateWatermark(){
+					if(this.watermarkOption.orientation == 'lowerRight'){
+							callback = watermark.image.lowerRight(this.watermarkOption.opacity / 100)
+						} else if(this.watermarkOption.orientation == 'lowerLeft'){
+							callback = watermark.image.lowerLeft(this.watermarkOption.opacity / 100)
+						} else if(this.watermarkOption.orientation == 'upperRight'){
+							callback = watermark.image.upperRight(this.watermarkOption.opacity / 100)
+						} else if(this.watermarkOption.orientation == 'upperLeft'){
+							callback = watermark.image.upperLeft(this.watermarkOption.opacity / 100)
+						} else if(this.watermarkOption.orientation == 'center'){
+							callback = watermark.image.center(this.watermarkOption.opacity / 100)
+						}
 					for(let i = 0; i < this.files.length; i++){
-						watermark([this.files[i], 'img/logo.png'])
-						.image(watermark.image.lowerRight(0.5))
+						watermark([this.files[i], this.watermarkOption.watermark])
+						.image(callback)
 						.then(function (img){
 							app.watermarkedFiles.push(img.src)
 						});
@@ -156,36 +156,21 @@
 				},
 				updateSample(){
 					if(this.watermarkOption.orientation == 'lowerRight'){
-						watermark(['img/sample.png', 'img/logo.png'])
-						.image(watermark.image.lowerRight(0.5))
-						.then(function (img){
-							app.sample = img.src
-						});
+						callback = watermark.image.lowerRight(this.watermarkOption.opacity / 100)
 					} else if(this.watermarkOption.orientation == 'lowerLeft'){
-						watermark(['img/sample.png', 'img/logo.png'])
-						.image(watermark.image.lowerLeft(0.5))
-						.then(function (img){
-							app.sample = img.src
-						});
+						callback = watermark.image.lowerLeft(this.watermarkOption.opacity / 100)
 					} else if(this.watermarkOption.orientation == 'upperRight'){
-						watermark(['img/sample.png', 'img/logo.png'])
-						.image(watermark.image.upperRight(0.5))
-						.then(function (img){
-							app.sample = img.src
-						});
+						callback = watermark.image.upperRight(this.watermarkOption.opacity / 100)
 					} else if(this.watermarkOption.orientation == 'upperLeft'){
-						watermark(['img/sample.png', 'img/logo.png'])
-						.image(watermark.image.upperLeft(0.5))
-						.then(function (img){
-							app.sample = img.src
-						});
+						callback = watermark.image.upperLeft(this.watermarkOption.opacity / 100)
 					} else if(this.watermarkOption.orientation == 'center'){
-						watermark(['img/sample.png', 'img/logo.png'])
-						.image(watermark.image.center(0.5))
-						.then(function (img){
-							app.sample = img.src
-						});
+						callback = watermark.image.center(this.watermarkOption.opacity / 100)
 					}
+					watermark(['img/sample.png', 'img/logo.png'])
+					.image(callback)
+					.then(function (img){
+						app.sample = img.src
+					});
 					
 				},
 			},
