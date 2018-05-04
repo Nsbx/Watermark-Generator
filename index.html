@@ -10,11 +10,16 @@
 	input[type=file] {
 		display: none;
 	}
+	.sample {
+		display:block;
+		width: 200px;
+		height: 200px;
+	}
 </style>
 </head>
 <body>
 	<div id="app">
-		<v-app>
+		<v-app :dark="option.dark">
 			<v-content>
 				<v-container>
 					<v-flex xs12>
@@ -23,6 +28,19 @@
 								<span class="headline">WaterMark Generator</span>
 							</v-card-title>
 							<v-card-text>
+								<v-container>
+									<img :src="sample" class="sample mx-auto">
+								</v-container>
+								<v-container>
+									{{ watermarkOption.orientation }}
+									<v-radio-group v-model="watermarkOption.orientation" @change="updateSample()">
+										<v-radio label="lowerRight" value="lowerRight"></v-radio>
+										<v-radio label="lowerLeft" value="lowerLeft"></v-radio>
+										<v-radio label="upperRight" value="upperRight"></v-radio>
+										<v-radio label="upperLeft" value="upperLeft"></v-radio>
+										<v-radio label="center" value="center"></v-radio>
+									</v-radio-group>
+								</v-container>
 								<v-container grid-list-md>
 									<v-layout wrap>
 										<v-flex xs12 sm6 md6>
@@ -48,7 +66,7 @@
 									<v-layout row wrap>
 										<v-flex xs4 v-for="file, n in watermarkedFiles" :key="n" >
 											<v-card flat tile>
-												<v-card-media :src="file.base64" height="200px"></v-card-media>
+												<v-card-media :src="file" height="200px"></v-card-media>
 											</v-card>
 										</v-flex>
 									</v-layout>
@@ -73,9 +91,16 @@
 		app = new Vue({
 			el: '#app',
 			data: {
+				option: {
+					dark: true,
+				},
 				files: [],
 				watermark: null,
 				watermarkedFiles: [],
+				sample: null,
+				watermarkOption: {
+					orientation: 'lowerRight',
+				},
 			},
 			methods: {
 				route(){
@@ -86,8 +111,7 @@
 						this.callbackParams = callbackParams;
 					}
 					if(this.routePath == "/callback"){
-						console.log("hey")
-						this.login()
+
 					}
 				},
 				openFileInput(){
@@ -122,16 +146,51 @@
 				},
 				generateWatermark(){
 					for(let i = 0; i < this.files.length; i++){
-						watermark([this.files[i], this.watermark])
+						watermark([this.files[i], './img/logo.png'])
 						.image(watermark.image.lowerRight(0.5))
 						.then(function (img){
-							app.watermarkedFiles.push(img)
+							app.watermarkedFiles.push(img.src)
 						});
 					}
-				}
+					this.files = [];
+				},
+				updateSample(){
+					if(this.watermarkOption.orientation == 'lowerRight'){
+						watermark(['./img/sample.png', './img/logo.png'])
+						.image(watermark.image.lowerRight(0.5))
+						.then(function (img){
+							app.sample = img.src
+						});
+					} else if(this.watermarkOption.orientation == 'lowerLeft'){
+						watermark(['./img/sample.png', './img/logo.png'])
+						.image(watermark.image.lowerLeft(0.5))
+						.then(function (img){
+							app.sample = img.src
+						});
+					} else if(this.watermarkOption.orientation == 'upperRight'){
+						watermark(['./img/sample.png', './img/logo.png'])
+						.image(watermark.image.upperRight(0.5))
+						.then(function (img){
+							app.sample = img.src
+						});
+					} else if(this.watermarkOption.orientation == 'upperLeft'){
+						watermark(['./img/sample.png', './img/logo.png'])
+						.image(watermark.image.upperLeft(0.5))
+						.then(function (img){
+							app.sample = img.src
+						});
+					} else if(this.watermarkOption.orientation == 'center'){
+						watermark(['./img/sample.png', './img/logo.png'])
+						.image(watermark.image.center(0.5))
+						.then(function (img){
+							app.sample = img.src
+						});
+					}
+					
+				},
 			},
 			created: function(){
-				this.route()
+				this.updateSample()
 			}
 		})
 	</script>
