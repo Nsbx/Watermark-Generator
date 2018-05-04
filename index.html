@@ -45,7 +45,7 @@
 									<v-layout wrap>
 										<v-flex xs12 sm4 md4>
 											<v-btn color="success" @click="openFileInput()">Upload File</v-btn>
-											<input type="file" id="fileInput" ref="fileInput" multiple @change="addFile(this)">
+											<input type="file" id="fileInput" ref="fileInput" @change="addFile(this)">
 										</v-flex>
 										<v-flex xs12 sm4 md4>
 											<v-btn color="success" @click="openWatermarkInput()">Upload Watermark</v-btn>
@@ -64,8 +64,9 @@
 		</v-app>
 	</div>
 
+	<script type="text/javascript" src="js/download.min.js"></script>
 	<script type="text/javascript" src="js/watermark.min.js"></script>
-	<script type="text/javascript" src="js/vue.min.js"></script>
+	<script type="text/javascript" src="js/vue.js"></script>
 	<script type="text/javascript" src="js/vuetify.min.js"></script>
 	<script>
 		app = new Vue({
@@ -75,8 +76,6 @@
 					dark: true,
 				},
 				files: [],
-				watermark: null,
-				watermarkedFiles: [],
 				sample: null,
 				watermarkOption: {
 					watermark: null,
@@ -125,9 +124,9 @@
 					let watermark = this.$refs.watermarkInput.files[0];
 					let reader = new FileReader();
 					reader.readAsDataURL(watermark);
-					let base64 = null;
 					let self = this;
 					reader.onload = function () {
+						let base64 = null;
 						base64 = reader.result;
 						watermark.base64 = base64;
 						self.watermarkOption.watermark = watermark;
@@ -135,21 +134,21 @@
 				},
 				generateWatermark(){
 					if(this.watermarkOption.orientation == 'lowerRight'){
-							callback = watermark.image.lowerRight(this.watermarkOption.opacity / 100)
-						} else if(this.watermarkOption.orientation == 'lowerLeft'){
-							callback = watermark.image.lowerLeft(this.watermarkOption.opacity / 100)
-						} else if(this.watermarkOption.orientation == 'upperRight'){
-							callback = watermark.image.upperRight(this.watermarkOption.opacity / 100)
-						} else if(this.watermarkOption.orientation == 'upperLeft'){
-							callback = watermark.image.upperLeft(this.watermarkOption.opacity / 100)
-						} else if(this.watermarkOption.orientation == 'center'){
-							callback = watermark.image.center(this.watermarkOption.opacity / 100)
-						}
+						callback = watermark.image.lowerRight(this.watermarkOption.opacity / 100)
+					} else if(this.watermarkOption.orientation == 'lowerLeft'){
+						callback = watermark.image.lowerLeft(this.watermarkOption.opacity / 100)
+					} else if(this.watermarkOption.orientation == 'upperRight'){
+						callback = watermark.image.upperRight(this.watermarkOption.opacity / 100)
+					} else if(this.watermarkOption.orientation == 'upperLeft'){
+						callback = watermark.image.upperLeft(this.watermarkOption.opacity / 100)
+					} else if(this.watermarkOption.orientation == 'center'){
+						callback = watermark.image.center(this.watermarkOption.opacity / 100)
+					}
 					for(let i = 0; i < this.files.length; i++){
 						watermark([this.files[i], this.watermarkOption.watermark])
 						.image(callback)
 						.then(function (img){
-							app.watermarkedFiles.push(img.src)
+							download(img.src, 'File '+i, 'image/png')
 						});
 					}
 					this.files = [];
