@@ -146,7 +146,7 @@
 				},
 				generateWatermark(){
 					for(let i = 0; i < this.files.length; i++){
-						watermark([this.files[i], './img/logo.png'])
+						watermark([this.files[i], 'img/logo.png'])
 						.image(watermark.image.lowerRight(0.5))
 						.then(function (img){
 							app.watermarkedFiles.push(img.src)
@@ -156,31 +156,31 @@
 				},
 				updateSample(){
 					if(this.watermarkOption.orientation == 'lowerRight'){
-						watermark(['./img/sample.png', './img/logo.png'])
+						watermark(['img/sample.png', 'img/logo.png'])
 						.image(watermark.image.lowerRight(0.5))
 						.then(function (img){
 							app.sample = img.src
 						});
 					} else if(this.watermarkOption.orientation == 'lowerLeft'){
-						watermark(['./img/sample.png', './img/logo.png'])
+						watermark(['img/sample.png', 'img/logo.png'])
 						.image(watermark.image.lowerLeft(0.5))
 						.then(function (img){
 							app.sample = img.src
 						});
 					} else if(this.watermarkOption.orientation == 'upperRight'){
-						watermark(['./img/sample.png', './img/logo.png'])
+						watermark(['img/sample.png', 'img/logo.png'])
 						.image(watermark.image.upperRight(0.5))
 						.then(function (img){
 							app.sample = img.src
 						});
 					} else if(this.watermarkOption.orientation == 'upperLeft'){
-						watermark(['./img/sample.png', './img/logo.png'])
+						watermark(['img/sample.png', 'img/logo.png'])
 						.image(watermark.image.upperLeft(0.5))
 						.then(function (img){
 							app.sample = img.src
 						});
 					} else if(this.watermarkOption.orientation == 'center'){
-						watermark(['./img/sample.png', './img/logo.png'])
+						watermark(['img/sample.png', 'img/logo.png'])
 						.image(watermark.image.center(0.5))
 						.then(function (img){
 							app.sample = img.src
